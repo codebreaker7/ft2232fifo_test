@@ -1,0 +1,3 @@
+[submodule "fifo_loopback"]
+	path = fifo_loopback
+	url = https://github.com/denysovoo/fifo_loopback.git
