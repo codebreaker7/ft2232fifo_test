@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FTD2XX_NET;
+using System.IO;
 
 namespace FtdiFifo
 {
@@ -134,12 +135,18 @@ namespace FtdiFifo
                     }
                 }
                 // read data
+                FileStream resFile = File.Create("recdata.txt");
+                StreamWriter writer = new StreamWriter(resFile);
                 uint available = 0;
                 uint read = 0;
                 ftHandle.GetRxBytesAvailable(ref available);
                 while (available != 0)
                 {
                     ftHandle.Read(resmasdata, available, ref read);
+                    for (int j = 0; j < read; j++)
+                    {
+                        writer.WriteLine(resmasdata[j]);
+                    }
                     if (read != available)
                     {
                         // not all data have been read
@@ -147,6 +154,9 @@ namespace FtdiFifo
                     }
                     ftHandle.GetRxBytesAvailable(ref available);
                 }
+                writer.Flush();
+                writer.Close();
+                resFile.Close();
             }
             var elapsedMs = watch.ElapsedMilliseconds;
             speedLabel.Text = ((4096 * 16 * 2) / elapsedMs * 1000).ToString() + " bytes/s"; // bytes / (ms*1000)
