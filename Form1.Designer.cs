@@ -35,6 +35,7 @@
             this.transmitButton = new System.Windows.Forms.Button();
             this.measureButton = new System.Windows.Forms.Button();
             this.speedLabel = new System.Windows.Forms.Label();
+            this.receiveContButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // identifyButton
@@ -102,11 +103,22 @@
             this.speedLabel.Size = new System.Drawing.Size(0, 13);
             this.speedLabel.TabIndex = 6;
             // 
+            // receiveContButton
+            // 
+            this.receiveContButton.Location = new System.Drawing.Point(142, 93);
+            this.receiveContButton.Name = "receiveContButton";
+            this.receiveContButton.Size = new System.Drawing.Size(155, 23);
+            this.receiveContButton.TabIndex = 7;
+            this.receiveContButton.Text = "Receive continuously";
+            this.receiveContButton.UseVisualStyleBackColor = true;
+            this.receiveContButton.Click += new System.EventHandler(this.receiveContButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(321, 277);
+            this.Controls.Add(this.receiveContButton);
             this.Controls.Add(this.speedLabel);
             this.Controls.Add(this.measureButton);
             this.Controls.Add(this.transmitButton);
@@ -130,6 +142,7 @@
         private System.Windows.Forms.Button transmitButton;
         private System.Windows.Forms.Button measureButton;
         private System.Windows.Forms.Label speedLabel;
+        private System.Windows.Forms.Button receiveContButton;
     }
 }
 
