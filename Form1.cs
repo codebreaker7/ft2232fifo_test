@@ -170,30 +170,24 @@ namespace FtdiFifo
         private void TestReception() 
         {
             // set up asynchronous reception
-            receivedDataEvent = new AutoResetEvent(false);
-            FTDI.FT_STATUS status = ftHandle.SetEventNotification(FTDI.FT_EVENTS.FT_EVENT_RXCHAR, receivedDataEvent);
-            worker = new BackgroundWorker();
-            worker.DoWork += ReadData;
-            if (!worker.IsBusy)
-            {
-                worker.RunWorkerAsync();
-            }
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            //receivedDataEvent = new AutoResetEvent(false);
+            //FTDI.FT_STATUS status = ftHandle.SetEventNotification(FTDI.FT_EVENTS.FT_EVENT_RXCHAR, receivedDataEvent);
+            //worker = new BackgroundWorker();
+            //worker.DoWork += ReadData;
+            //if (!worker.IsBusy)
+            //{
+            //    worker.RunWorkerAsync();
+            //}
+            //worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            Thread backThread = new Thread(() => { this.ReadData(); });
+            backThread.Start();
         }
 
-        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void ReadData()
         {
-            MessageBox.Show("Received all data");
-        }
-
-        private void ReadData(object sender, DoWorkEventArgs args)
-        {
-            uint totalRecBytes = 4096 * 100; // 400 kbytes
-            byte[] bufMemory = new byte[totalRecBytes];
-            byte[] resmasdata = new byte[4096];
             uint available = 0;
             uint read = 0;
-            uint received = 0;
+            received = 0;
             FTDI.FT_STATUS status;
             // send data
             uint written = 0;
@@ -209,7 +203,87 @@ namespace FtdiFifo
             }
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            long[] timeValues = new long[100];
+            long[] timeValues = new long[50000];
+            int timeIndex = 0;
+
+            while (received < totalRecBytes)
+            {
+                //receivedDataEvent.WaitOne();
+                status = ftHandle.GetRxBytesAvailable(ref available);
+                if (status != FTDI.FT_STATUS.FT_OK)
+                {
+                    break;
+                }
+                if (available > 0)
+                {
+                    status = ftHandle.Read(resmasdata, available, ref read);
+                    // copy data to larger array
+                    if (received + read < totalRecBytes)
+                        Array.Copy(resmasdata, 0, bufMemory, (int)received, (int)read);
+                    received += read;
+                }
+                timeValues[timeIndex++] = watch.ElapsedMilliseconds;
+            }
+            MessageBox.Show(String.Format("{0}", timeIndex));
+            // write data to the file
+            FileStream resFile = File.Create("rectest.txt");
+            StreamWriter writer = new StreamWriter(resFile);
+            for (int i = 0; i < totalRecBytes; i++)
+            {
+                writer.WriteLine("{0:X}", bufMemory[i]);
+                //writer.WriteLine(bufMemory[i]);
+            }
+            writer.Flush();
+            writer.Close();
+            resFile.Close();
+            // write time values to the file
+            FileStream timeFile = File.Create("timetest.txt");
+            writer = new StreamWriter(timeFile);
+            for (int i = 0; i < timeValues.Length; i++)
+            {
+                writer.WriteLine("{0}", timeValues[i]);
+            }
+            writer.Flush();
+            writer.Close();
+            timeFile.Close();
+        }
+
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Received all data");
+            if (e.Cancelled)
+            {
+                MessageBox.Show("Operation cancelled");
+            }
+        }
+
+        uint totalRecBytes = 4096 * 2000; // 400 Kbytes
+        byte[] resmasdata = new byte[4096];
+        byte[] bufMemory = new byte[4096 * 2000];
+        uint received = 0;
+
+        private void ReadData(object sender, DoWorkEventArgs args)
+        {
+            
+            uint available = 0;
+            uint read = 0;
+            received = 0;
+            FTDI.FT_STATUS status;
+            // send data
+            uint written = 0;
+            byte[] masdata = new byte[4096]; // start array 
+            masdata[0] = (byte)0x03;
+            for (int i = 0; i < masdata.Length; i++)
+            {
+                masdata[i] = (byte)(i % 256);
+            }
+            for (int i = 0; i < 1; i++)
+            {
+                ftHandle.Write(masdata, masdata.Length, ref written);
+            }
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            long[] timeValues = new long[1000];
             int timeIndex = 0;
 
             while (received < totalRecBytes)
@@ -227,8 +301,10 @@ namespace FtdiFifo
                     Array.Copy(resmasdata, 0, bufMemory, (int)received, (int)read);
                     received += read;
                 }
+                args.Result = timeIndex;
                 timeValues[timeIndex++] = watch.ElapsedMilliseconds;
             }
+            MessageBox.Show(String.Format("{0}", timeIndex));
             // write data to the file
             FileStream resFile = File.Create("rectest.txt");
             StreamWriter writer = new StreamWriter(resFile);
