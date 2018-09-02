@@ -18,13 +18,13 @@ namespace FtdiFifo
         private FTDI ftHandle = new FTDI();
         private FTDI.FT_DEVICE_INFO_NODE[] deviceInfos = new FTDI.FT_DEVICE_INFO_NODE[2];
         private string serialNumber = new string(' ', 32);
-        private byte[] data = new byte[128];
-        private byte[] recData = new byte[128];
+        private byte[] data = new byte[4096];
+        private byte[] recData = new byte[4096];
 
         public Form1()
         {
             InitializeComponent();
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 4096; i++)
             {
                 data[i] = (byte)(i % 256);
             }
@@ -104,6 +104,52 @@ namespace FtdiFifo
                     return;
                 }
             }
+        }
+
+        private void TestReliability()
+        {
+            Thread thread = new Thread((ThreadStart)delegate
+            {
+                FTDI.FT_STATUS status;
+                uint txQueue = 0;
+                uint rxQueue = 0;
+                int iterCount = 0;
+                for (iterCount = 0; iterCount < 1000000; iterCount++)
+                {
+                    // check buffer
+                    status = ftHandle.GetTxBytesWaiting(ref txQueue);
+                    if (txQueue == 0)
+                    {
+                        // write data
+                        uint written = 0;
+                        ftHandle.Write(data, data.Length, ref written);
+                        if (written == 0)
+                        {
+                            MessageBox.Show("No data have been written");
+                            return;
+                        }
+                    }
+                    // check read buffer
+                    status = ftHandle.GetRxBytesAvailable(ref rxQueue);
+                    if (rxQueue > 0)
+                    {
+                        // read data
+                        uint read = 0;
+                        ftHandle.Read(recData, (uint)rxQueue, ref read);
+                        if (read == 0)
+                        {
+                            MessageBox.Show("No data have been read from FIFO");
+                            return;
+                        }
+                    }
+                    //iterCountLabel.Text = iterCount.ToString();
+                    iterCountLabel.Invoke((MethodInvoker)delegate
+                    {
+                        iterCountLabel.Text = iterCount.ToString();
+                    });
+                }
+            });
+            thread.Start();
         }
 
         private void MeasureSpeed()
@@ -351,6 +397,11 @@ namespace FtdiFifo
         private void receiveContButton_Click(object sender, EventArgs e)
         {
             TestReception();
+        }
+
+        private void testReliabilityButton_Click(object sender, EventArgs e)
+        {
+            TestReliability();
         }
     }
 }

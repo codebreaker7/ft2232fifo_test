@@ -36,6 +36,8 @@
             this.measureButton = new System.Windows.Forms.Button();
             this.speedLabel = new System.Windows.Forms.Label();
             this.receiveContButton = new System.Windows.Forms.Button();
+            this.testReliabilityButton = new System.Windows.Forms.Button();
+            this.iterCountLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // identifyButton
@@ -113,11 +115,31 @@
             this.receiveContButton.UseVisualStyleBackColor = true;
             this.receiveContButton.Click += new System.EventHandler(this.receiveContButton_Click);
             // 
+            // testReliabilityButton
+            // 
+            this.testReliabilityButton.Location = new System.Drawing.Point(142, 122);
+            this.testReliabilityButton.Name = "testReliabilityButton";
+            this.testReliabilityButton.Size = new System.Drawing.Size(155, 23);
+            this.testReliabilityButton.TabIndex = 8;
+            this.testReliabilityButton.Text = "Test reliability";
+            this.testReliabilityButton.UseVisualStyleBackColor = true;
+            this.testReliabilityButton.Click += new System.EventHandler(this.testReliabilityButton_Click);
+            // 
+            // iterCountLabel
+            // 
+            this.iterCountLabel.AutoSize = true;
+            this.iterCountLabel.Location = new System.Drawing.Point(98, 127);
+            this.iterCountLabel.Name = "iterCountLabel";
+            this.iterCountLabel.Size = new System.Drawing.Size(0, 13);
+            this.iterCountLabel.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(321, 277);
+            this.Controls.Add(this.iterCountLabel);
+            this.Controls.Add(this.testReliabilityButton);
             this.Controls.Add(this.receiveContButton);
             this.Controls.Add(this.speedLabel);
             this.Controls.Add(this.measureButton);
@@ -143,6 +165,8 @@
         private System.Windows.Forms.Button measureButton;
         private System.Windows.Forms.Label speedLabel;
         private System.Windows.Forms.Button receiveContButton;
+        private System.Windows.Forms.Button testReliabilityButton;
+        private System.Windows.Forms.Label iterCountLabel;
     }
 }
 
