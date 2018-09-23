@@ -38,6 +38,7 @@
             this.receiveContButton = new System.Windows.Forms.Button();
             this.testReliabilityButton = new System.Windows.Forms.Button();
             this.iterCountLabel = new System.Windows.Forms.Label();
+            this.readSequenceButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // identifyButton
@@ -133,11 +134,22 @@
             this.iterCountLabel.Size = new System.Drawing.Size(0, 13);
             this.iterCountLabel.TabIndex = 9;
             // 
+            // readSequenceButton
+            // 
+            this.readSequenceButton.Location = new System.Drawing.Point(42, 34);
+            this.readSequenceButton.Name = "readSequenceButton";
+            this.readSequenceButton.Size = new System.Drawing.Size(91, 23);
+            this.readSequenceButton.TabIndex = 10;
+            this.readSequenceButton.Text = "Read sequence";
+            this.readSequenceButton.UseVisualStyleBackColor = true;
+            this.readSequenceButton.Click += new System.EventHandler(this.readSequenceButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(321, 277);
+            this.Controls.Add(this.readSequenceButton);
             this.Controls.Add(this.iterCountLabel);
             this.Controls.Add(this.testReliabilityButton);
             this.Controls.Add(this.receiveContButton);
@@ -167,6 +179,7 @@
         private System.Windows.Forms.Button receiveContButton;
         private System.Windows.Forms.Button testReliabilityButton;
         private System.Windows.Forms.Label iterCountLabel;
+        private System.Windows.Forms.Button readSequenceButton;
     }
 }
 

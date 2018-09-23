@@ -79,18 +79,19 @@ namespace FtdiFifo
             uint txQueue = 0;
             uint rxQueue = 0;
             // check buffer
-            status = ftHandle.GetTxBytesWaiting(ref txQueue);
-            if (txQueue == 0)
-            {
-                // write data
-                uint written = 0;
-                ftHandle.Write(data, data.Length, ref written);
-                if (written == 0)
-                {
-                    MessageBox.Show("No data have been written");
-                    return;
-                }
-            }
+            //status = ftHandle.GetTxBytesWaiting(ref txQueue);
+            //if (txQueue == 0)
+            //{
+            //    // write data
+            //    uint written = 0;
+            //    ftHandle.Write(data, data.Length, ref written);
+            //    if (written == 0)
+            //    {
+            //        MessageBox.Show("No data have been written");
+            //        return;
+            //    }
+            //}
+            //Thread.Sleep(10);
             // check read buffer
             status = ftHandle.GetRxBytesAvailable(ref rxQueue);
             if (rxQueue > 0)
@@ -102,6 +103,33 @@ namespace FtdiFifo
                 {
                     MessageBox.Show("No data have been read from FIFO");
                     return;
+                }
+            }
+        }
+
+        private void ReadPackageSequence()
+        {
+            FTDI.FT_STATUS status;
+            uint rxQueue = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                status = ftHandle.GetRxBytesAvailable(ref rxQueue);
+                if (rxQueue > 0 && status == FTDI.FT_STATUS.FT_OK)
+                {
+                    uint read = 0;
+                    ftHandle.Read(recData, (uint)recData.Length, ref read);
+                    // check data consistency
+                    byte startIndex = (byte)i;
+                    byte curValue = startIndex;
+                    for (int j = 0; j < recData.Length; j++)
+                    {
+                        if (curValue != recData[j])
+                        {
+                            MessageBox.Show(string.Format("Incorrect value received in {0} package in {j} position", i, j));
+                            return;
+                        }
+                        curValue++;
+                    }
                 }
             }
         }
@@ -249,7 +277,7 @@ namespace FtdiFifo
             }
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            long[] timeValues = new long[50000];
+            long[] timeValues = new long[1000000];
             int timeIndex = 0;
 
             while (received < totalRecBytes)
@@ -402,6 +430,11 @@ namespace FtdiFifo
         private void testReliabilityButton_Click(object sender, EventArgs e)
         {
             TestReliability();
+        }
+
+        private void readSequenceButton_Click(object sender, EventArgs e)
+        {
+            ReadPackageSequence();
         }
     }
 }
