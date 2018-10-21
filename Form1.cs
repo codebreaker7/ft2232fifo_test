@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using FTD2XX_NET;
 using System.IO;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace FtdiFifo
 {
@@ -28,6 +29,8 @@ namespace FtdiFifo
             {
                 data[i] = (byte)(i % 256);
             }
+            data[0] = 34;
+            data[1] = 35;
         }
 
         private void IdentifyDevice()
@@ -71,6 +74,54 @@ namespace FtdiFifo
             ftHandle.InTransferSize(0x10000);
             ftHandle.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_RTS_CTS, 0, 0);
  
+        }
+
+
+        volatile uint rxQueue = 0;
+        [MethodImpl(MethodImplOptions.NoOptimization|MethodImplOptions.NoInlining)]
+        private void SendDataIntoFifo()
+        {
+            FTDI.FT_STATUS status;
+            uint txQueue = 0;
+            
+            // check buffer
+            status = ftHandle.GetTxBytesWaiting(ref txQueue);
+            if (txQueue == 0)
+            {
+                // write data
+                uint written = 0;
+                ftHandle.Write(data, data.Length, ref written);
+                if (written == 0)
+                {
+                    MessageBox.Show("No data have been written");
+                    return;
+                }
+            }
+            Thread.Sleep(20);
+            status = ftHandle.GetRxBytesAvailable(ref rxQueue);
+            if (rxQueue > 0 && status == FTDI.FT_STATUS.FT_OK)
+            {
+                // read data
+                uint read = 0;
+                ftHandle.Read(recData, (uint)rxQueue, ref read);
+                if (read == 0)
+                {
+                    MessageBox.Show("No data have been read from FIFO");
+                    return;
+                }
+            }
+            //status = ftHandle.GetTxBytesWaiting(ref txQueue);
+            //if (txQueue == 0)
+            //{
+            //    // write data
+            //    uint written = 0;
+            //    ftHandle.Write(data, data.Length, ref written);
+            //    if (written == 0)
+            //    {
+            //        MessageBox.Show("No data have been written");
+            //        return;
+            //    }
+            //}
         }
 
         private void SendDataOverFifo()
@@ -335,6 +386,7 @@ namespace FtdiFifo
         byte[] resmasdata = new byte[4096];
         byte[] bufMemory = new byte[4096 * 2000];
         uint received = 0;
+        private string dataFileName;
 
         private void ReadData(object sender, DoWorkEventArgs args)
         {
@@ -435,6 +487,60 @@ namespace FtdiFifo
         private void readSequenceButton_Click(object sender, EventArgs e)
         {
             ReadPackageSequence();
+        }
+
+        private void sendDataButton_Click(object sender, EventArgs e)
+        {
+            SendDataIntoFifo();
+        }
+
+        private void selectFileButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Text files | *.txt";
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                fileTextBox.Text = dialog.FileName;
+                dataFileName = dialog.FileName;
+            }
+        }
+
+        private void sendFileDataButton_Click(object sender, EventArgs e)
+        {
+            string[] lines = File.ReadAllLines(dataFileName);
+            byte[] dataArray = new byte[lines.Length];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                dataArray[i] = byte.Parse(lines[i]);
+            }
+            uint txQueue = 0;
+            ftHandle.GetTxBytesWaiting(ref txQueue);
+            if (txQueue == 0)
+            {
+                uint written = 0;
+                ftHandle.Write(dataArray, dataArray.Length, ref written);
+            }
+            else
+            {
+                MessageBox.Show("Some data is waiting");
+            }
+            // sleep to make sure that data have been processed
+            Thread.Sleep(50);
+            uint rxQueue = 0;
+            ftHandle.GetRxBytesAvailable(ref rxQueue);
+            if (rxQueue > 0)
+            {
+                uint read = 0;
+                ftHandle.Read(recData, rxQueue, ref read);
+                FileStream timeFile = File.Create("ReceivedValuesFile.txt");
+                StreamWriter writer = new StreamWriter(timeFile);
+                for (int i = 0; i < read; i++)
+                {
+                    writer.WriteLine("{0}", recData[i]);
+                }
+                writer.Flush();
+                writer.Close();
+            }
         }
     }
 }

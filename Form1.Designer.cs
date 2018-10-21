@@ -39,6 +39,10 @@
             this.testReliabilityButton = new System.Windows.Forms.Button();
             this.iterCountLabel = new System.Windows.Forms.Label();
             this.readSequenceButton = new System.Windows.Forms.Button();
+            this.sendDataButton = new System.Windows.Forms.Button();
+            this.fileTextBox = new System.Windows.Forms.TextBox();
+            this.selectFileButton = new System.Windows.Forms.Button();
+            this.sendFileDataButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // identifyButton
@@ -144,11 +148,52 @@
             this.readSequenceButton.UseVisualStyleBackColor = true;
             this.readSequenceButton.Click += new System.EventHandler(this.readSequenceButton_Click);
             // 
+            // sendDataButton
+            // 
+            this.sendDataButton.Location = new System.Drawing.Point(142, 151);
+            this.sendDataButton.Name = "sendDataButton";
+            this.sendDataButton.Size = new System.Drawing.Size(75, 23);
+            this.sendDataButton.TabIndex = 11;
+            this.sendDataButton.Text = "Send data";
+            this.sendDataButton.UseVisualStyleBackColor = true;
+            this.sendDataButton.Click += new System.EventHandler(this.sendDataButton_Click);
+            // 
+            // fileTextBox
+            // 
+            this.fileTextBox.Location = new System.Drawing.Point(12, 189);
+            this.fileTextBox.Name = "fileTextBox";
+            this.fileTextBox.Size = new System.Drawing.Size(216, 20);
+            this.fileTextBox.TabIndex = 12;
+            // 
+            // selectFileButton
+            // 
+            this.selectFileButton.Location = new System.Drawing.Point(234, 186);
+            this.selectFileButton.Name = "selectFileButton";
+            this.selectFileButton.Size = new System.Drawing.Size(75, 23);
+            this.selectFileButton.TabIndex = 13;
+            this.selectFileButton.Text = "Select file";
+            this.selectFileButton.UseVisualStyleBackColor = true;
+            this.selectFileButton.Click += new System.EventHandler(this.selectFileButton_Click);
+            // 
+            // sendFileDataButton
+            // 
+            this.sendFileDataButton.Location = new System.Drawing.Point(12, 215);
+            this.sendFileDataButton.Name = "sendFileDataButton";
+            this.sendFileDataButton.Size = new System.Drawing.Size(86, 23);
+            this.sendFileDataButton.TabIndex = 14;
+            this.sendFileDataButton.Text = "Send from file";
+            this.sendFileDataButton.UseVisualStyleBackColor = true;
+            this.sendFileDataButton.Click += new System.EventHandler(this.sendFileDataButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(321, 277);
+            this.Controls.Add(this.sendFileDataButton);
+            this.Controls.Add(this.selectFileButton);
+            this.Controls.Add(this.fileTextBox);
+            this.Controls.Add(this.sendDataButton);
             this.Controls.Add(this.readSequenceButton);
             this.Controls.Add(this.iterCountLabel);
             this.Controls.Add(this.testReliabilityButton);
@@ -180,6 +225,10 @@
         private System.Windows.Forms.Button testReliabilityButton;
         private System.Windows.Forms.Label iterCountLabel;
         private System.Windows.Forms.Button readSequenceButton;
+        private System.Windows.Forms.Button sendDataButton;
+        private System.Windows.Forms.TextBox fileTextBox;
+        private System.Windows.Forms.Button selectFileButton;
+        private System.Windows.Forms.Button sendFileDataButton;
     }
 }
 
